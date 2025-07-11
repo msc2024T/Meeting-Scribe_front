@@ -68,9 +68,9 @@ export default function RegisterPage() {
     try {
       const response = await apiService.register(formData);
 
-      if (response.success && response.data.token) {
+      if (response.success && response.data.data?.access) {
         // Store the token
-        localStorage.setItem("authToken", response.data.token);
+        localStorage.setItem("authToken", response.data.data.access);
 
         // Redirect to dashboard or home page
         router.push("/dashboard");
