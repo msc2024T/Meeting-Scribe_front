@@ -178,6 +178,31 @@ export interface Notification {
   createdAt: string;
 }
 
+// Audio file types
+export interface AudioFile {
+  id: string;
+  name: string;
+  size: number;
+  extention: string;
+  durtion_seconds: number;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+  };
+  uploaded_at: string;
+}
+
+export interface AudioFileListResponse {
+  data: AudioFile[];
+}
+
+export interface AudioFileUrlResponse {
+  audio_file_url: string;
+}
+
 // Settings types
 export interface UserSettings {
   notifications: {

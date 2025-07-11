@@ -5,6 +5,9 @@ import {
   Meeting,
   CreateMeetingRequest,
   UpdateMeetingRequest,
+  AudioFile,
+  AudioFileListResponse,
+  AudioFileUrlResponse,
 } from "./types";
 
 // API service class
@@ -99,6 +102,32 @@ class ApiService {
     file: File
   ): Promise<ApiResponse<{ id: string; filename: string; url: string }>> {
     return httpService.uploadFile("/files/audio-files/", file, "audio_file");
+  }
+
+  // List audio files endpoint
+  public async getAudioFiles(): Promise<ApiResponse<AudioFileListResponse>> {
+    return httpService.get("/files/audio-files/");
+  }
+
+  // Get single audio file endpoint
+  public async getAudioFile(
+    audioFileId: string
+  ): Promise<ApiResponse<AudioFile>> {
+    return httpService.get(`/files/audio-files/${audioFileId}/`);
+  }
+
+  // Get audio file download URL endpoint
+  public async getAudioFileUrl(
+    audioFileId: string
+  ): Promise<ApiResponse<AudioFileUrlResponse>> {
+    return httpService.get(`/files/audio-files/${audioFileId}/`);
+  }
+
+  // Delete audio file endpoint
+  public async deleteAudioFile(
+    audioFileId: string
+  ): Promise<ApiResponse<void>> {
+    return httpService.delete(`/audio-files/${audioFileId}/`);
   }
 
   public async generateSummary(
