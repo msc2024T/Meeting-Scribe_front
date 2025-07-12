@@ -3,8 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { apiService } from "@/utils";
 import { LoginRequest } from "@/utils/types";
+import { useAppDispatch } from "@/store/hooks";
+import { loginSuccess } from "@/store/slices/authSlice";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState<LoginRequest>({
@@ -16,6 +19,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isRemembered, setIsRemembered] = useState(false);
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -41,7 +45,16 @@ export default function LoginPage() {
       console.log("Login response:", response);
 
       if (response.data && response.data.data && response.data.data.access) {
-        // Store the tokens
+        // Dispatch login success to Redux store
+        dispatch(
+          loginSuccess({
+            access: response.data.data.access,
+            refresh: response.data.data.refresh,
+            user: response.data.data.user,
+          })
+        );
+
+        // Store the tokens for backward compatibility
         if (isRemembered) {
           localStorage.setItem("authToken", response.data.data.access);
           localStorage.setItem("refreshToken", response.data.data.refresh);
@@ -69,20 +82,14 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto h-12 w-12 bg-indigo-600 rounded-lg flex items-center justify-center mb-4">
-            <svg
-              className="h-8 w-8 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-              />
-            </svg>
+          <div className="mx-auto h-16 w-16 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center mb-4 shadow-lg overflow-hidden">
+            <Image
+              src="/logo.png"
+              alt="Meeting Scribe Logo"
+              width={48}
+              height={48}
+              className="object-contain"
+            />
           </div>
           <h2 className="text-3xl font-bold text-gray-900">Welcome back</h2>
           <p className="mt-2 text-sm text-gray-600">

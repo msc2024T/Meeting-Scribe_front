@@ -2,28 +2,168 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { apiService } from "@/utils";
 import AudioUpload from "@/components/AudioUpload";
 import AudioList from "@/components/AudioList";
+import Drawer from "@/components/Drawer";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { logout as reduxLogout } from "@/store/slices/authSlice";
+import { AudioFile } from "@/utils/types";
 
 export default function DashboardPage() {
   const [refreshAudioList, setRefreshAudioList] = useState(0);
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+
+  // Drawer state
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [drawerAudioFile, setDrawerAudioFile] = useState<AudioFile | null>(
+    null
+  );
+  const [drawerType, setDrawerType] = useState<"transcription" | "summary">(
+    "transcription"
+  );
+  const [drawerData, setDrawerData] = useState<string | null>(null);
+  const [drawerAudioUrl, setDrawerAudioUrl] = useState<string | null>(null);
+  const [transcriptionData, setTranscriptionData] = useState<{
+    [key: string]: string;
+  }>({});
+  const [summaryData, setSummaryData] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token =
-        localStorage.getItem("authToken") ||
-        sessionStorage.getItem("authToken");
+      // Check Redux state first
+      if (!isAuthenticated) {
+        // Fallback to localStorage/sessionStorage for backward compatibility
+        const token =
+          localStorage.getItem("authToken") ||
+          sessionStorage.getItem("authToken");
 
-      if (!token) {
-        router.push("/login");
-        return;
+        if (!token) {
+          router.push("/login");
+          return;
+        }
       }
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, isAuthenticated]);
+
+  const openDrawer = async (
+    audioFile: AudioFile,
+    type: "transcription" | "summary"
+  ) => {
+    setDrawerAudioFile(audioFile);
+    setDrawerType(type);
+    setIsDrawerOpen(true);
+
+    // Load audio URL for the drawer
+    try {
+      const response = await apiService.getAudioFileUrl(audioFile.id);
+      if (response.success && response.data) {
+        setDrawerAudioUrl(response.data.audio_file_url);
+      }
+    } catch (error) {
+      console.error("Error loading audio URL:", error);
+    }
+
+    // Set drawer data if available
+    if (type === "transcription") {
+      setDrawerData(transcriptionData[audioFile.id] || null);
+    } else {
+      setDrawerData(summaryData[audioFile.id] || null);
+    }
+  };
+
+  const closeDrawer = () => {
+    setIsDrawerOpen(false);
+    setDrawerAudioFile(null);
+    setDrawerData(null);
+    setDrawerAudioUrl(null);
+  };
+
+  const handleTranscribeAudio = async (audioFileId: string) => {
+    try {
+      const response = await apiService.createTranscription(audioFileId);
+      if (response.success) {
+        // Start polling for transcription status
+        pollTranscriptionStatus(audioFileId);
+      }
+    } catch (error) {
+      console.error("Error starting transcription:", error);
+    }
+  };
+
+  const handleSummarizeAudio = async (audioFileId: string) => {
+    try {
+      const response = await apiService.createAudioSummary(audioFileId);
+      if (response.success) {
+        // Start polling for summary status
+        pollSummaryStatus(audioFileId);
+      }
+    } catch (error) {
+      console.error("Error starting summary:", error);
+    }
+  };
+
+  const pollTranscriptionStatus = async (audioFileId: string) => {
+    try {
+      const response = await apiService.getTranscriptionStatus(audioFileId);
+      if (response.success && response.data) {
+        const status = response.data.status;
+
+        if (status === "processing" || status === "pending") {
+          // Continue polling every 5 seconds
+          setTimeout(() => pollTranscriptionStatus(audioFileId), 5000);
+        } else if (status === "completed" && response.data.transcript) {
+          // Store the transcript data
+          setTranscriptionData((prev) => ({
+            ...prev,
+            [audioFileId]: response.data.transcript!,
+          }));
+
+          // Update drawer data if this is the current audio file
+          if (
+            drawerAudioFile?.id === audioFileId &&
+            drawerType === "transcription"
+          ) {
+            setDrawerData(response.data.transcript);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error polling transcription status:", error);
+    }
+  };
+
+  const pollSummaryStatus = async (audioFileId: string) => {
+    try {
+      const response = await apiService.getAudioSummaryStatus(audioFileId);
+      if (response.success && response.data) {
+        const status = response.data.status;
+
+        if (status === "processing" || status === "pending") {
+          // Continue polling every 5 seconds
+          setTimeout(() => pollSummaryStatus(audioFileId), 5000);
+        } else if (status === "completed" && response.data.summary) {
+          // Store the summary data
+          setSummaryData((prev) => ({
+            ...prev,
+            [audioFileId]: response.data.summary!,
+          }));
+
+          // Update drawer data if this is the current audio file
+          if (drawerAudioFile?.id === audioFileId && drawerType === "summary") {
+            setDrawerData(response.data.summary);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error polling summary status:", error);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -31,10 +171,15 @@ export default function DashboardPage() {
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
+      // Clear Redux state
+      dispatch(reduxLogout());
+
+      // Clear localStorage/sessionStorage for backward compatibility
       localStorage.removeItem("authToken");
       localStorage.removeItem("refreshToken");
       sessionStorage.removeItem("authToken");
       sessionStorage.removeItem("refreshToken");
+
       router.push("/login");
     }
   };
@@ -67,20 +212,14 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="h-10 w-10 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <svg
-                    className="h-6 w-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                    />
-                  </svg>
+                <div className="h-10 w-10 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
+                  <Image
+                    src="/logo.png"
+                    alt="Meeting Scribe Logo"
+                    width={32}
+                    height={32}
+                    className="object-contain"
+                  />
                 </div>
               </div>
               <div className="ml-4">
@@ -90,7 +229,28 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="flex items-center">
+            <div className="flex items-center space-x-4">
+              {/* User Info */}
+              {user && (
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-semibold text-sm">
+                        {user.first_name.charAt(0)}
+                        {user.last_name.charAt(0)}
+                      </span>
+                    </div>
+                    <div className="hidden sm:block">
+                      <p className="text-sm font-medium text-slate-700">
+                        {user.first_name} {user.last_name}
+                      </p>
+                      <p className="text-xs text-slate-500">{user.email}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Logout Button */}
               <button
                 onClick={handleLogout}
                 className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white px-6 py-2 rounded-xl text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
@@ -115,10 +275,35 @@ export default function DashboardPage() {
         {/* Audio List Section */}
         <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-slate-200/50">
           <div className="p-8">
-            <AudioList refreshTrigger={refreshAudioList} />
+            <AudioList
+              refreshTrigger={refreshAudioList}
+              onOpenDrawer={openDrawer}
+            />
           </div>
         </div>
       </main>
+
+      {/* Drawer */}
+      <Drawer
+        isOpen={isDrawerOpen}
+        onClose={closeDrawer}
+        audioFile={drawerAudioFile}
+        type={drawerType}
+        data={drawerData}
+        status={
+          drawerAudioFile
+            ? drawerType === "transcription"
+              ? "completed" // You may want to track status properly
+              : "completed"
+            : ""
+        }
+        onStartAction={
+          drawerType === "transcription"
+            ? handleTranscribeAudio
+            : handleSummarizeAudio
+        }
+        audioUrl={drawerAudioUrl}
+      />
     </div>
   );
 }

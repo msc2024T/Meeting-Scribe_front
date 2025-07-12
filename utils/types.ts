@@ -93,6 +93,36 @@ export interface Transcript {
   updatedAt: string;
 }
 
+// Audio transcription types
+export interface AudioTranscriptionRequest {
+  audioFileId: string;
+}
+
+export interface AudioTranscriptionResponse {
+  id: string;
+  status: "pending" | "processing" | "completed" | "failed";
+  message: string;
+  progress?: number;
+  transcript?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Audio summarization types
+export interface AudioSummarizationRequest {
+  audioFileId: string;
+}
+
+export interface AudioSummarizationResponse {
+  id: string;
+  status: "pending" | "processing" | "completed" | "failed";
+  message: string;
+  progress?: number;
+  summary?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Summary types
 export interface Summary {
   id: string;

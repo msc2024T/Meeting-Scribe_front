@@ -3,8 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { apiService } from "@/utils";
 import { RegisterRequest } from "@/utils/types";
+import { useAppDispatch } from "@/store/hooks";
+import { loginSuccess } from "@/store/slices/authSlice";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState<RegisterRequest>({
@@ -18,6 +21,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -69,7 +73,16 @@ export default function RegisterPage() {
       const response = await apiService.register(formData);
 
       if (response.success && response.data.data?.access) {
-        // Store the token
+        // Dispatch login success to Redux store
+        dispatch(
+          loginSuccess({
+            access: response.data.data.access,
+            refresh: response.data.data.refresh,
+            user: response.data.data.user,
+          })
+        );
+
+        // Store the token for backward compatibility
         localStorage.setItem("authToken", response.data.data.access);
 
         // Redirect to dashboard or home page
@@ -92,20 +105,14 @@ export default function RegisterPage() {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto h-12 w-12 bg-indigo-600 rounded-lg flex items-center justify-center mb-4">
-            <svg
-              className="h-8 w-8 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-              />
-            </svg>
+          <div className="mx-auto h-16 w-16 bg-gradient-to-br from-violet-600 to-purple-600 rounded-xl flex items-center justify-center mb-4 shadow-lg overflow-hidden">
+            <Image
+              src="/logo.png"
+              alt="Meeting Scribe Logo"
+              width={48}
+              height={48}
+              className="object-contain"
+            />
           </div>
           <h2 className="text-3xl font-bold text-gray-900">
             Create your account

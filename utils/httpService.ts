@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { getAuthTokenFromStore } from "./storeAccessor";
 
 // HTTP Response interface
 export interface ApiResponse<T = any> {
@@ -87,7 +88,13 @@ class HttpService {
   }
 
   private getAuthToken(): string | null {
-    // Get token from localStorage, sessionStorage, or cookies
+    // First try to get token from Redux store
+    const reduxToken = getAuthTokenFromStore();
+    if (reduxToken) {
+      return reduxToken;
+    }
+
+    // Fallback to localStorage/sessionStorage for backward compatibility
     if (typeof window !== "undefined") {
       return (
         localStorage.getItem("authToken") || sessionStorage.getItem("authToken")

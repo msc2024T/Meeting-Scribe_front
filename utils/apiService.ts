@@ -123,6 +123,38 @@ class ApiService {
     return httpService.get(`/files/audio-files/${audioFileId}/`);
   }
 
+  // Create transcription from audio file
+  public async createTranscription(
+    audioFileId: string
+  ): Promise<ApiResponse<{ id: string; status: string; message: string }>> {
+    return httpService.post(`/files/audio-files/${audioFileId}/transcribe/`);
+  }
+
+  // Get transcription status
+  public async getTranscriptionStatus(
+    audioFileId: string
+  ): Promise<
+    ApiResponse<{ status: string; progress?: number; transcript?: string }>
+  > {
+    return httpService.get(`/files/audio-files/${audioFileId}/transcription/`);
+  }
+
+  // Create summary from audio file
+  public async createAudioSummary(
+    audioFileId: string
+  ): Promise<ApiResponse<{ id: string; status: string; message: string }>> {
+    return httpService.post(`/files/audio-files/${audioFileId}/summarize/`);
+  }
+
+  // Get summary status
+  public async getAudioSummaryStatus(
+    audioFileId: string
+  ): Promise<
+    ApiResponse<{ status: string; progress?: number; summary?: string }>
+  > {
+    return httpService.get(`/files/audio-files/${audioFileId}/summary/`);
+  }
+
   // Delete audio file endpoint
   public async deleteAudioFile(
     audioFileId: string

@@ -137,9 +137,11 @@ export default function AudioUpload({
         onDragLeave={handleDragLeave}
       >
         {/* Animated background pattern */}
-        <div className={`absolute inset-0 rounded-2xl transition-opacity duration-500 ${
-          dragActive ? 'opacity-20' : 'opacity-0'
-        }`}>
+        <div
+          className={`absolute inset-0 rounded-2xl transition-opacity duration-500 ${
+            dragActive ? "opacity-20" : "opacity-0"
+          }`}
+        >
           <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-purple-500/10 rounded-2xl"></div>
           <div className="absolute top-4 right-4 w-8 h-8 bg-violet-200/50 rounded-full animate-pulse"></div>
           <div className="absolute bottom-6 left-6 w-6 h-6 bg-purple-200/50 rounded-full animate-pulse delay-300"></div>
@@ -147,7 +149,7 @@ export default function AudioUpload({
         </div>
 
         <div className="text-center relative z-10">
-          <div className={`mx-auto mb-6 ${dragActive ? 'animate-bounce' : ''}`}>
+          <div className={`mx-auto mb-6 ${dragActive ? "animate-bounce" : ""}`}>
             <div className="w-20 h-20 mx-auto bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-600 rounded-full flex items-center justify-center shadow-2xl shadow-violet-300/50 ring-4 ring-white ring-opacity-50">
               <svg
                 className="w-10 h-10 text-white"
@@ -168,14 +170,26 @@ export default function AudioUpload({
             <label htmlFor="audio-upload" className="cursor-pointer group">
               <div className="space-y-3">
                 <h3 className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-                  {dragActive ? "Drop your audio file here" : "Upload Audio File"}
+                  {dragActive
+                    ? "Drop your audio file here"
+                    : "Upload Audio File"}
                 </h3>
                 <p className="text-slate-600 text-base">
                   Drag and drop your audio file here, or click to browse
                 </p>
                 <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-violet-300/50 hover:shadow-xl hover:shadow-violet-400/50 transform hover:scale-105 group-hover:scale-105">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
                   </svg>
                   Choose File
                 </div>
@@ -192,14 +206,34 @@ export default function AudioUpload({
           </div>
           <div className="mt-6 flex items-center justify-center space-x-6 text-sm text-slate-500">
             <div className="flex items-center bg-white/70 backdrop-blur-sm px-3 py-2 rounded-lg border border-slate-200/50">
-              <svg className="w-4 h-4 mr-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-4 h-4 mr-2 text-emerald-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               MP3, WAV, OGG, M4A
             </div>
             <div className="flex items-center bg-white/70 backdrop-blur-sm px-3 py-2 rounded-lg border border-slate-200/50">
-              <svg className="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 21h10a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a4 4 0 004 4z" />
+              <svg
+                className="w-4 h-4 mr-2 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 21h10a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a4 4 0 004 4z"
+                />
               </svg>
               Max 50MB
             </div>
@@ -238,7 +272,9 @@ export default function AudioUpload({
                     <span className="inline-flex items-center bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full text-sm font-medium mr-2">
                       {formatFileSize(selectedFile.size)}
                     </span>
-                    <span className="text-emerald-600 font-medium">Ready to upload</span>
+                    <span className="text-emerald-600 font-medium">
+                      Ready to upload
+                    </span>
                   </p>
                 </div>
               </div>
@@ -247,7 +283,11 @@ export default function AudioUpload({
                 className="flex-shrink-0 p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200 hover:scale-105"
                 disabled={isUploading}
               >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <svg
+                  className="w-6 h-6"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path
                     fillRule="evenodd"
                     d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -262,8 +302,18 @@ export default function AudioUpload({
               <div className="mt-8">
                 <div className="flex justify-between text-sm font-semibold text-slate-700 mb-3">
                   <span className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    <svg
+                      className="w-4 h-4 mr-2 text-violet-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
                     </svg>
                     Uploading...
                   </span>
@@ -289,16 +339,41 @@ export default function AudioUpload({
               >
                 {isUploading ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-6 w-6 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-6 w-6 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
                     </svg>
                     Uploading your audio file...
                   </>
                 ) : (
                   <>
-                    <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    <svg
+                      className="w-6 h-6 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
                     </svg>
                     Upload Audio File
                   </>
