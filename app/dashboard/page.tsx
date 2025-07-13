@@ -6,7 +6,7 @@ import Image from "next/image";
 import { apiService } from "@/utils";
 import AudioUpload from "@/components/AudioUpload";
 import AudioList from "@/components/AudioList";
-import Drawer from "@/components/Drawer";
+import DrawerManager from "@/components/DrawerManager";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout as reduxLogout } from "@/store/slices/authSlice";
 import { AudioFile } from "@/utils/types";
@@ -25,12 +25,6 @@ export default function DashboardPage() {
   const [drawerType, setDrawerType] = useState<"transcription" | "summary">(
     "transcription"
   );
-  const [drawerData, setDrawerData] = useState<string | null>(null);
-  const [drawerAudioUrl, setDrawerAudioUrl] = useState<string | null>(null);
-  const [transcriptionData, setTranscriptionData] = useState<{
-    [key: string]: string;
-  }>({});
-  const [summaryData, setSummaryData] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -51,118 +45,18 @@ export default function DashboardPage() {
     checkAuth();
   }, [router, isAuthenticated]);
 
-  const openDrawer = async (
+  const openDrawer = (
     audioFile: AudioFile,
     type: "transcription" | "summary"
   ) => {
     setDrawerAudioFile(audioFile);
     setDrawerType(type);
     setIsDrawerOpen(true);
-
-    // Load audio URL for the drawer
-    try {
-      const response = await apiService.getAudioFileUrl(audioFile.id);
-      if (response.success && response.data) {
-        setDrawerAudioUrl(response.data.audio_file_url);
-      }
-    } catch (error) {
-      console.error("Error loading audio URL:", error);
-    }
-
-    // Set drawer data if available
-    if (type === "transcription") {
-      setDrawerData(transcriptionData[audioFile.id] || null);
-    } else {
-      setDrawerData(summaryData[audioFile.id] || null);
-    }
   };
 
   const closeDrawer = () => {
     setIsDrawerOpen(false);
     setDrawerAudioFile(null);
-    setDrawerData(null);
-    setDrawerAudioUrl(null);
-  };
-
-  const handleTranscribeAudio = async (audioFileId: string) => {
-    try {
-      const response = await apiService.createTranscription(audioFileId);
-      if (response.success) {
-        // Start polling for transcription status
-        pollTranscriptionStatus(audioFileId);
-      }
-    } catch (error) {
-      console.error("Error starting transcription:", error);
-    }
-  };
-
-  const handleSummarizeAudio = async (audioFileId: string) => {
-    try {
-      const response = await apiService.createAudioSummary(audioFileId);
-      if (response.success) {
-        // Start polling for summary status
-        pollSummaryStatus(audioFileId);
-      }
-    } catch (error) {
-      console.error("Error starting summary:", error);
-    }
-  };
-
-  const pollTranscriptionStatus = async (audioFileId: string) => {
-    try {
-      const response = await apiService.getTranscriptionStatus(audioFileId);
-      if (response.success && response.data) {
-        const status = response.data.status;
-
-        if (status === "processing" || status === "pending") {
-          // Continue polling every 5 seconds
-          setTimeout(() => pollTranscriptionStatus(audioFileId), 5000);
-        } else if (status === "completed" && response.data.transcript) {
-          // Store the transcript data
-          setTranscriptionData((prev) => ({
-            ...prev,
-            [audioFileId]: response.data.transcript!,
-          }));
-
-          // Update drawer data if this is the current audio file
-          if (
-            drawerAudioFile?.id === audioFileId &&
-            drawerType === "transcription"
-          ) {
-            setDrawerData(response.data.transcript);
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error polling transcription status:", error);
-    }
-  };
-
-  const pollSummaryStatus = async (audioFileId: string) => {
-    try {
-      const response = await apiService.getAudioSummaryStatus(audioFileId);
-      if (response.success && response.data) {
-        const status = response.data.status;
-
-        if (status === "processing" || status === "pending") {
-          // Continue polling every 5 seconds
-          setTimeout(() => pollSummaryStatus(audioFileId), 5000);
-        } else if (status === "completed" && response.data.summary) {
-          // Store the summary data
-          setSummaryData((prev) => ({
-            ...prev,
-            [audioFileId]: response.data.summary!,
-          }));
-
-          // Update drawer data if this is the current audio file
-          if (drawerAudioFile?.id === audioFileId && drawerType === "summary") {
-            setDrawerData(response.data.summary);
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error polling summary status:", error);
-    }
   };
 
   const handleLogout = async () => {
@@ -284,25 +178,11 @@ export default function DashboardPage() {
       </main>
 
       {/* Drawer */}
-      <Drawer
+      <DrawerManager
         isOpen={isDrawerOpen}
         onClose={closeDrawer}
         audioFile={drawerAudioFile}
         type={drawerType}
-        data={drawerData}
-        status={
-          drawerAudioFile
-            ? drawerType === "transcription"
-              ? "completed" // You may want to track status properly
-              : "completed"
-            : ""
-        }
-        onStartAction={
-          drawerType === "transcription"
-            ? handleTranscribeAudio
-            : handleSummarizeAudio
-        }
-        audioUrl={drawerAudioUrl}
       />
     </div>
   );

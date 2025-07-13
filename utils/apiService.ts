@@ -124,10 +124,25 @@ class ApiService {
   }
 
   // Create transcription from audio file
-  public async createTranscription(
+  public async createTranscription(audioFileId: string): Promise<
+    ApiResponse<{
+      message: string;
+      data: { text: string };
+    }>
+  > {
+    return httpService.post(`/transcriptions/transcriptions/${audioFileId}/`);
+  }
+
+  // Get transcription directly (if exists)
+  public async getTranscription(
     audioFileId: string
-  ): Promise<ApiResponse<{ id: string; status: string; message: string }>> {
-    return httpService.post(`/files/audio-files/${audioFileId}/transcribe/`);
+  ): Promise<
+    ApiResponse<
+      | { id: number; text: string; audio_file: string; created_at: string }
+      | string
+    >
+  > {
+    return httpService.get(`/transcriptions/transcriptions/${audioFileId}/`);
   }
 
   // Get transcription status
@@ -155,17 +170,48 @@ class ApiService {
     return httpService.get(`/files/audio-files/${audioFileId}/summary/`);
   }
 
-  // Delete audio file endpoint
-  public async deleteAudioFile(
-    audioFileId: string
-  ): Promise<ApiResponse<void>> {
-    return httpService.delete(`/audio-files/${audioFileId}/`);
+  // New summarizer endpoints
+  // Get summary from summarizer service
+  public async getSummary(audioFileId: string): Promise<
+    ApiResponse<
+      | {
+          subject: string;
+          action_items: Array<{
+            id: number;
+            description: string;
+            assigned_to: string;
+            due_date: string;
+            status: string;
+          }>;
+          key_points: Array<{
+            id: number;
+            content: string;
+          }>;
+        }
+      | { error: string }
+    >
+  > {
+    return httpService.get(`/summarizer/summarize/${audioFileId}/`);
   }
 
-  public async generateSummary(
-    meetingId: string
-  ): Promise<ApiResponse<{ summary: string }>> {
-    return httpService.post(`/meetings/${meetingId}/summary`);
+  // Create summary using summarizer service
+  public async createSummary(audioFileId: string): Promise<
+    ApiResponse<{
+      subject: string;
+      action_items: Array<{
+        id: number;
+        description: string;
+        assigned_to: string;
+        due_date: string;
+        status: string;
+      }>;
+      key_points: Array<{
+        id: number;
+        content: string;
+      }>;
+    }>
+  > {
+    return httpService.post(`/summarizer/summarize/${audioFileId}/`);
   }
 
   // Search endpoints

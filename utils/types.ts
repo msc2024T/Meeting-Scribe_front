@@ -124,130 +124,23 @@ export interface AudioSummarizationResponse {
 }
 
 // Summary types
-export interface Summary {
-  id: string;
-  meetingId: string;
-  content: string;
-  keyPoints: string[];
-  actionItems: ActionItem[];
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface ActionItem {
-  id: string;
-  text: string;
-  assignedTo?: string;
-  dueDate?: string;
-  status: "pending" | "in-progress" | "completed";
-  createdAt: string;
-  updatedAt: string;
+  id: number;
+  description: string;
+  assigned_to: string;
+  due_date: string;
+  status: string;
 }
 
-// Search types
-export interface SearchQuery {
-  query: string;
-  filters?: {
-    startDate?: string;
-    endDate?: string;
-    participants?: string[];
-    status?: Meeting["status"];
-  };
-  limit?: number;
-  offset?: number;
+export interface KeyPoint {
+  id: number;
+  content: string;
 }
 
-export interface SearchResult<T> {
-  items: T[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-// Pagination types
-export interface PaginationParams {
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: "asc" | "desc";
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrevious: boolean;
-  };
-}
-
-// File upload types
-export interface FileUploadResponse {
-  url: string;
-  filename: string;
-  size: number;
-  mimeType: string;
-  uploadedAt: string;
-}
-
-// Notification types
-export interface Notification {
-  id: string;
-  userId: string;
-  type:
-    | "meeting_started"
-    | "meeting_ended"
-    | "transcript_ready"
-    | "summary_ready";
-  title: string;
-  message: string;
-  read: boolean;
-  createdAt: string;
-}
-
-// Audio file types
-export interface AudioFile {
-  id: string;
-  name: string;
-  size: number;
-  extention: string;
-  durtion_seconds: number;
-  user: {
-    id: number;
-    username: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-  };
-  uploaded_at: string;
-}
-
-export interface AudioFileListResponse {
-  data: AudioFile[];
-}
-
-export interface AudioFileUrlResponse {
-  audio_file_url: string;
-}
-
-// Settings types
-export interface UserSettings {
-  notifications: {
-    email: boolean;
-    push: boolean;
-    meetingReminders: boolean;
-    transcriptReady: boolean;
-    summaryReady: boolean;
-  };
-  preferences: {
-    language: string;
-    timezone: string;
-    dateFormat: string;
-    timeFormat: "12h" | "24h";
-  };
+export interface SummaryData {
+  subject: string;
+  action_items: ActionItem[];
+  key_points: KeyPoint[];
 }
 
 // Health check types
