@@ -143,6 +143,31 @@ export interface SummaryData {
   key_points: KeyPoint[];
 }
 
+// Audio file types
+export interface AudioFile {
+  id: string;
+  name: string;
+  size: number;
+  extention: string;
+  durtion_seconds: number;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+  };
+  uploaded_at: string;
+}
+
+export interface AudioFileListResponse {
+  data: AudioFile[];
+}
+
+export interface AudioFileUrlResponse {
+  audio_file_url: string;
+}
+
 // Health check types
 export interface HealthCheckResponse {
   status: "healthy" | "unhealthy";

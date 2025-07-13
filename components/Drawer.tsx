@@ -1,24 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SummaryData } from "@/utils/types";
-
-// AudioFile interface definition (should be moved to types.ts eventually)
-interface AudioFile {
-  id: string;
-  name: string;
-  size: number;
-  extention: string;
-  durtion_seconds: number;
-  user: {
-    id: number;
-    username: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-  };
-  uploaded_at: string;
-}
+import { SummaryData, AudioFile } from "@/utils/types";
 
 interface DrawerProps {
   isOpen: boolean;

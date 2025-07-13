@@ -2,25 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Drawer from "./Drawer";
-import { SummaryData } from "@/utils/types";
+import { SummaryData, AudioFile } from "@/utils/types";
 import { apiService } from "@/utils";
-
-// AudioFile interface definition (should be moved to types.ts eventually)
-interface AudioFile {
-  id: string;
-  name: string;
-  size: number;
-  extention: string;
-  durtion_seconds: number;
-  user: {
-    id: number;
-    username: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-  };
-  uploaded_at: string;
-}
 
 interface DrawerManagerProps {
   audioFile: AudioFile | null;
