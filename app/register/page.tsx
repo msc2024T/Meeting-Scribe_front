@@ -6,12 +6,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { apiService } from "@/utils";
 import { RegisterRequest } from "@/utils/types";
-import { useAppDispatch } from "@/store/hooks";
-import { loginSuccess } from "@/store/slices/authSlice";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState<RegisterRequest>({
-    name: "",
+    first_name: "",
+    last_name: "",
     email: "",
     password: "",
   });
@@ -21,7 +20,6 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
-  const dispatch = useAppDispatch();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -38,8 +36,12 @@ export default function RegisterPage() {
   };
 
   const validateForm = () => {
-    if (!formData.name.trim()) {
-      setError("Name is required");
+    if (!formData.first_name.trim()) {
+      setError("First name is required");
+      return false;
+    }
+    if (!formData.last_name.trim()) {
+      setError("Last name is required");
       return false;
     }
     if (!formData.email.trim()) {
@@ -72,23 +74,15 @@ export default function RegisterPage() {
     try {
       const response = await apiService.register(formData);
 
-      if (response.success && response.data.data?.access) {
-        // Dispatch login success to Redux store
-        dispatch(
-          loginSuccess({
-            access: response.data.data.access,
-            refresh: response.data.data.refresh,
-            user: response.data.data.user,
-          })
+      if (response.success && response.data.data?.id) {
+        // Registration successful - redirect to login page
+        router.push(
+          "/login?message=Registration successful! Please sign in with your credentials."
         );
-
-        // Store the token for backward compatibility
-        localStorage.setItem("authToken", response.data.data.access);
-
-        // Redirect to dashboard or home page
-        router.push("/dashboard");
       } else {
-        setError("Registration failed. Please try again.");
+        setError(
+          response.data.message || "Registration failed. Please try again."
+        );
       }
     } catch (err: any) {
       setError(
@@ -149,25 +143,48 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* Name Field */}
+            {/* First Name Field */}
             <div>
               <label
-                htmlFor="name"
+                htmlFor="first_name"
                 className="block text-sm font-medium text-gray-700"
               >
-                Full Name
+                First Name
               </label>
               <div className="mt-1">
                 <input
-                  id="name"
-                  name="name"
+                  id="first_name"
+                  name="first_name"
                   type="text"
-                  autoComplete="name"
+                  autoComplete="given-name"
                   required
-                  value={formData.name}
+                  value={formData.first_name}
                   onChange={handleInputChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
-                  placeholder="Enter your full name"
+                  placeholder="Enter your first name"
+                />
+              </div>
+            </div>
+
+            {/* Last Name Field */}
+            <div>
+              <label
+                htmlFor="last_name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Last Name
+              </label>
+              <div className="mt-1">
+                <input
+                  id="last_name"
+                  name="last_name"
+                  type="text"
+                  autoComplete="family-name"
+                  required
+                  value={formData.last_name}
+                  onChange={handleInputChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
+                  placeholder="Enter your last name"
                 />
               </div>
             </div>

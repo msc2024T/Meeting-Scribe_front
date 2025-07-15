@@ -44,10 +44,14 @@ class HttpService {
     // Request interceptor
     this.api.interceptors.request.use(
       (config) => {
-        // Add auth token if available
-        const token = this.getAuthToken();
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+        // Add auth token if available and required
+        const requiresAuth =
+          (config as HttpRequestConfig).requiresAuth !== false;
+        if (requiresAuth) {
+          const token = this.getAuthToken();
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
         }
 
         console.log(

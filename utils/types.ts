@@ -28,8 +28,9 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
-  name: string;
   email: string;
+  first_name: string;
+  last_name: string;
   password: string;
 }
 

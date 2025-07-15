@@ -18,11 +18,18 @@ class ApiService {
     password: string,
     is_remembered: boolean = false
   ): Promise<ApiResponse<LoginResponse>> {
-    return httpService.post("/users/login/", {
-      email,
-      password,
-      is_remembered,
-    });
+    // Login should not require authentication
+    return httpService.post(
+      "/users/login/",
+      {
+        email,
+        password,
+        is_remembered,
+      },
+      {
+        requiresAuth: false,
+      }
+    );
   }
 
   public async logout(): Promise<ApiResponse<void>> {
@@ -32,11 +39,26 @@ class ApiService {
   }
 
   public async register(userData: {
-    name: string;
     email: string;
+    first_name: string;
+    last_name: string;
     password: string;
-  }): Promise<ApiResponse<LoginResponse>> {
-    return httpService.post("/auth/register", userData);
+  }): Promise<
+    ApiResponse<{
+      data: {
+        id: number;
+        username: string;
+        email: string;
+        first_name: string;
+        last_name: string;
+      };
+      message: string;
+    }>
+  > {
+    // Signup should not require authentication
+    return httpService.post("/users/signup/", userData, {
+      requiresAuth: false,
+    });
   }
 
   public async refreshToken(): Promise<ApiResponse<{ token: string }>> {
